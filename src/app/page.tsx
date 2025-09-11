@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import ProblemAgitation from "@/components/ProblemAgitation";
+import SolutionPresentation from "@/components/SolutionPresentation";
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
       <Header />
        <Hero />
        <ProblemAgitation />
+       <SolutionPresentation />
     </>
   );
 }

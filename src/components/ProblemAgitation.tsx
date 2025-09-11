@@ -16,7 +16,7 @@ export default function ProblemAgitation() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <Card
             title="Reparos Caros"
-            description="Taxas escondidas e custos de mão de obra inflacionados prejudicando seu orçamento"
+            description="Taxas escondidas e custos de mão de obra inflacionados"
             icon={
               <svg
                 className="w-8 h-8 text-red-600"
@@ -30,7 +30,7 @@ export default function ProblemAgitation() {
           />
 
           <Card
-            title="Vendedores Pouco Confiáveis"
+            title="Falta de Confiança"
             description="Histórico duvidoso das motos e problemas ocultos"
             icon={
               <svg
