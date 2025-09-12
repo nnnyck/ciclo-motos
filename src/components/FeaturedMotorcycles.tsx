@@ -107,7 +107,7 @@ const motorcycles: Motorcycle[] = [
 const categories = ["all", "street", "trail", "sport"] as const;
 
 export default function FeaturedMotorcycles() {
-  const [filter, setFilter] = useState<"all" | "sport" | "cruiser" | "touring" | "adventure">("all");
+  const [filter, setFilter] = useState<"all" | "street" | "trail" | "sport">("all");
 
   const filtered = filter === "all" ? motorcycles : motorcycles.filter((m) => m.category === filter);
 
