@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -60,12 +61,12 @@ export default function Header() {
             >
               Contato
             </a>
-            <a
-              href="tel:+1-555-MOTO-PRO"
+          <Link
+              href="/auth"
               className="bg-[#F36A21] hover:bg-[#E55A1A] text-white font-montserrat font-bold text-lg px-6 py-3 rounded-lg shadow-md transition-all duration-250 ease-in-out"
             >
               Login
-            </a>
+          </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -115,7 +116,7 @@ export default function Header() {
                 Contato
               </a>
               <a
-                href="tel:+1-555-MOTO-PRO"
+                href="../pages/Auth"
                 className="bg-[#F36A21] hover:bg-[#E55A1A] text-white font-montserrat font-bold px-6 py-3 rounded-lg shadow-md text-center transition-all duration-250 ease-in-out"
               >
                 Login
