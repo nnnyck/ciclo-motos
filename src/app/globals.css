@@ -47,4 +47,9 @@ body {
   .animate-slide-up {
     animation: slide-up 1s ease-out forwards;
   }
+
+  html {
+  scroll-behavior: smooth;
+}
+
 }

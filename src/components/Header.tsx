@@ -49,13 +49,13 @@ export default function Header() {
               Serviços
             </a>
             <a
-              href="#sobre"
+              href="#testimonials"
               className="text-[#6C757D] hover:text-[#F36A21] transition duration-250"
             >
               Sobre
             </a>
             <a
-              href="#contato"
+              href="#contact"
               className="text-[#6C757D] hover:text-[#F36A21] transition duration-250"
             >
               Contato
@@ -94,31 +94,31 @@ export default function Header() {
                 href="#motorcycles"
                 className="text-[#6C757D] hover:text-[#F36A21] transition duration-250"
               >
-                Motorcycles
+                Motos
               </a>
               <a
                 href="#services"
                 className="text-[#6C757D] hover:text-[#F36A21] transition duration-250"
               >
-                Services
+                Serviços
               </a>
               <a
-                href="#about"
+                href="#testimonials"
                 className="text-[#6C757D] hover:text-[#F36A21] transition duration-250"
               >
-                About
+                Sobre
               </a>
               <a
                 href="#contact"
                 className="text-[#6C757D] hover:text-[#F36A21] transition duration-250"
               >
-                Contact
+                Contato
               </a>
               <a
                 href="tel:+1-555-MOTO-PRO"
                 className="bg-[#F36A21] hover:bg-[#E55A1A] text-white font-montserrat font-bold px-6 py-3 rounded-lg shadow-md text-center transition-all duration-250 ease-in-out"
               >
-                Call Now
+                Login
               </a>
             </div>
           </div>
