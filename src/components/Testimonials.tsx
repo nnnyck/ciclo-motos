@@ -12,7 +12,7 @@ const testimonials = [
   {
     id: 2,
     name: "Sarah Martinez",
-    img: "",
+    // img: "",
     fallback:
       "",
     text: `"Serviço rápido, honesto e com preço justo. Consertaram o problema elétrico da minha moto que em outras oficinas ninguém resolveu. Aqui é confiança de verdade!"`,

@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { useRouter } from 'next/navigation';
 
 export default function AuthPage() {
+  const router = useRouter();
   const [view, setView] = useState<'login' | 'signup' | 'forgotPassword'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,7 +36,7 @@ export default function AuthPage() {
     setMessage('');
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) setMessage(error.message);
-    else setMessage('Login realizado com sucesso!');
+    else router.push('/');;
   };
 
   const handleResetPassword = async () => {

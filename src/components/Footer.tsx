@@ -14,10 +14,10 @@ export default function Footer() {
                 <path d="M20 2L35 10v20L20 38L5 30V10L20 2z" />
                 <path d="M20 8L30 14v12L20 32L10 26V14L20 8z" fill="white" />
                 <text x="20" y="24" textAnchor="middle" className="text-xs font-bold fill-current">
-                  MH
+                  CM
                 </text>
               </svg>
-              <span className="ml-3 text-xl font-montserrat font-bold">MotoHub Pro</span>
+              <span className="ml-3 text-xl font-montserrat font-bold">Ciclo Motos</span>
             </div>
             <p className="text-gray-300 mb-4">
               Sua loja de motos de confiança, com mais de 15 anos de experiência, serviço especializado e preços honestos.
