@@ -3,12 +3,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+
+interface Profile {
+  name: string;
+}
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const router = useRouter();
 
   const toggleMobileMenu = () => setMenuOpen(!menuOpen);
