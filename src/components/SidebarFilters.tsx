@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getMarcasComContagem } from "@/lib/motos";
+import { getMarcasComContagem, getCategorias } from "@/lib/motos";
 
 export interface Filters {
   marcas: string[];
   tipos: string[];
 }
 
-interface MarcaComContagem {
+export interface MarcaComContagem {
   marca: string;
   quantidade: number;
 }
@@ -17,39 +17,45 @@ interface SidebarFiltersProps {
   onFilterChange: (filters: Filters) => void;
 }
 
-export default function SidebarFilters({ onFilterChange }: SidebarFiltersProps) {
+export default function SidebarFilters({ onFilterChange, className }: SidebarFiltersProps & { className?: string }) {
   const [availableMarcas, setAvailableMarcas] = useState<MarcaComContagem[]>([]);
+  const [availableCategorias, setAvailableCategorias] = useState<string[]>([]);
   const [selectedMarcas, setSelectedMarcas] = useState<string[]>([]);
   const [selectedTipos, setSelectedTipos] = useState<string[]>([]);
-  const tiposDisponiveis = ["Street", "Trail", "Sport"];
 
   useEffect(() => {
-    const fetchMarcas = async () => {
+    const fetchData = async () => {
       try {
-        const marcas = await getMarcasComContagem();
+        const [marcas, categorias] = await Promise.all([
+          getMarcasComContagem(),
+          getCategorias(),
+        ]);
+
         setAvailableMarcas(marcas);
+        setAvailableCategorias(categorias);
       } catch (err) {
-        console.error("Erro ao buscar marcas:", err);
+        console.error("Erro ao buscar filtros:", err);
       }
     };
-    fetchMarcas();
+
+    fetchData();
   }, []);
 
-  const toggleMarca = (marca: string) => {
-    const updated = selectedMarcas.includes(marca)
-      ? selectedMarcas.filter((m) => m !== marca)
-      : [...selectedMarcas, marca];
-    setSelectedMarcas(updated);
-    onFilterChange({ marcas: updated, tipos: selectedTipos });
-  };
+    useEffect(() => {
+      onFilterChange({ marcas: selectedMarcas, tipos: selectedTipos });
+    }, [selectedMarcas, selectedTipos, onFilterChange]);
 
-  const toggleTipo = (tipo: string) => {
-    const updated = selectedTipos.includes(tipo)
-      ? selectedTipos.filter((t) => t !== tipo)
-      : [...selectedTipos, tipo];
-    setSelectedTipos(updated);
-    onFilterChange({ marcas: selectedMarcas, tipos: updated });
-  };
+    const toggleMarca = (marca: string) => {
+      setSelectedMarcas((prev) =>
+        prev.includes(marca) ? prev.filter((m) => m !== marca) : [...prev, marca]
+      );
+    };
+
+    const toggleTipo = (tipo: string) => {
+      setSelectedTipos((prev) =>
+        prev.includes(tipo) ? prev.filter((t) => t !== tipo) : [...prev, tipo]
+      );
+    };
 
   const limparFiltros = () => {
     setSelectedMarcas([]);
@@ -58,13 +64,16 @@ export default function SidebarFilters({ onFilterChange }: SidebarFiltersProps) 
   };
 
   return (
-    <aside className="w-64 bg-white rounded-2xl shadow-md p-6 space-y-6">
+    <aside className={`w-64 bg-white rounded-2xl shadow-md p-6 space-y-6 ${className}`}>
       {/* Marcas */}
       <div>
-        <h3 className="font-bold text-lg mb-2">Marcas</h3>
+        <h3 className="font-bold text-lg text-gray-800 mb-2">Marcas</h3>
         <div className="flex flex-col gap-2">
           {availableMarcas.map((m) => (
-            <label key={m.marca} className="flex items-center justify-between gap-2 cursor-pointer">
+            <label
+              key={m.marca}
+              className="flex items-center justify-between gap-2 cursor-pointer"
+            >
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -80,12 +89,15 @@ export default function SidebarFilters({ onFilterChange }: SidebarFiltersProps) 
         </div>
       </div>
 
-      {/* Tipos */}
+      {/* Categorias (Tipos) */}
       <div>
-        <h3 className="font-bold text-lg mb-2">Tipo de Moto</h3>
+        <h3 className="font-bold text-lg text-gray-800 mb-2">Categorias</h3>
         <div className="flex flex-col gap-2">
-          {tiposDisponiveis.map((tipo) => (
-            <label key={tipo} className="flex items-center gap-2 cursor-pointer">
+          {availableCategorias.map((tipo) => (
+            <label
+              key={tipo}
+              className="flex items-center gap-2 cursor-pointer"
+            >
               <input
                 type="checkbox"
                 checked={selectedTipos.includes(tipo)}
