@@ -37,12 +37,13 @@ export default function AdminPage() {
       const motosWithId: MotoWithId[] = (data || []).filter((m): m is MotoWithId => !!m.id);
       setMotos(motosWithId);
 
-    } catch (err: any) {
-      console.error('Erro ao buscar motos:', err);
-    } finally {
-      setLoading(false);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Erro ao buscar motos:', err.message);
+      } else {
+        console.error('Erro desconhecido ao buscar motos:', err);
+      }
     }
-  }
 
   async function uploadFiles(motoId: string, files: FileList) {
     for (const f of Array.from(files)) {
