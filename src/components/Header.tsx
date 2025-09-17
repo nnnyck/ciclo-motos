@@ -5,16 +5,20 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import { useAdmin } from "@/hooks/useAdmin";
 
 interface Profile {
   name: string;
 }
 
 export default function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const { isAdmin } = useAdmin();
+  const [menuOpen, setMenuOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const router = useRouter();
+
+
 
   const toggleMobileMenu = () => setMenuOpen(!menuOpen);
 
@@ -25,7 +29,6 @@ export default function Header() {
       setUser(user);
 
       if (user) {
-        // busca o perfil na tabela profiles
         const { data: profileData, error } = await supabase
           .from("profiles")
           .select("name")
@@ -40,7 +43,6 @@ export default function Header() {
 
     getUserAndProfile();
 
-    // Escuta mudanças de auth (login/logout)
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user ?? null);
@@ -107,6 +109,11 @@ export default function Header() {
             {user ? (
               <>
                 <span className="text-[#6C757D]">Olá, {profile?.name}</span>
+                 {isAdmin && (
+                  <Link href="/admin" className="bg-red-600 text-white px-4 py-2 rounded">
+                    Admin
+                  </Link>
+                )}
                 <button
                   onClick={handleLogout}
                   className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold px-6 py-2 rounded-lg transition"
