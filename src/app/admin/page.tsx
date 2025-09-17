@@ -44,6 +44,7 @@ export default function AdminPage() {
         console.error('Erro desconhecido ao buscar motos:', err);
       }
     }
+  }
 
   async function uploadFiles(motoId: string, files: FileList) {
     for (const f of Array.from(files)) {
