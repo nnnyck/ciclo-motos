@@ -91,7 +91,6 @@ export default function MotosPage() {
 
   return (
     <>
-      <Header />
       <main className="bg-gray-100 min-h-screen py-12 px-4 md:px-12 flex flex-col md:flex-row gap-8">
         {/* Sidebar */}
         <div className="w-full md:w-64 flex-shrink-0 flex justify-center md:justify-start">
