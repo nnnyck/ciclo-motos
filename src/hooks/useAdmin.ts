@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { Session } from '@supabase/supabase-js';
 
 export function useAdmin() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
     const checkAdmin = async () => {
