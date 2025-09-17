@@ -99,6 +99,9 @@ export default function Header() {
             <a href="#serviços" className="text-[#6C757D] hover:text-[#F36A21] transition">
               Serviços
             </a>
+            <a href="/agendarServicos" className="text-[#6C757D] hover:text-[#F36A21] transition">
+              Agendar Serviços
+            </a>
             <a href="#testimonials" className="text-[#6C757D] hover:text-[#F36A21] transition">
               Sobre
             </a>
@@ -152,6 +155,9 @@ export default function Header() {
             </a>
             <a href="#serviços" className="text-[#6C757D] hover:text-[#F36A21] transition">
               Serviços
+            </a>
+            <a href="/agendarServicos" className="text-[#6C757D] hover:text-[#F36A21] transition">
+              Agendar Serviços
             </a>
             <a href="#testimonials" className="text-[#6C757D] hover:text-[#F36A21] transition">
               Sobre

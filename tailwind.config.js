@@ -44,6 +44,20 @@ module.exports = {
       transitionDuration: {
         250: "250ms",
       },
+      keyframes: {
+        slideUp: {
+          '0%': { transform: 'translateY(50px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideDown: {
+          '0%': { transform: 'translateY(0)', opacity: '1' },
+          '100%': { transform: 'translateY(50px)', opacity: '0' },
+        },
+      },
+      animation: {
+        slideUp: 'slideUp 0.3s ease-out forwards',
+        slideDown: 'slideDown 0.3s ease-in forwards',
+      },
     },
   },
   plugins: [],
