@@ -40,13 +40,13 @@ export default function Hero() {
 
             {/* Botão branco */}
                <a
-    href="#serviços"
-    className="bg-white text-[#F36A21] border border-white font-montserrat font-bold text-lg px-8 py-4 rounded-lg shadow-md
-             transition-all duration-250 ease-in-out hover:bg-[#F36A21] hover:text-white hover:border-white"
-    >
-    Agende um Serviço
-      </a>
-        </div>
+                href="/agendarServicos"
+                className="bg-white text-[#F36A21] border border-white font-montserrat font-bold text-lg px-8 py-4 rounded-lg shadow-md
+                        transition-all duration-250 ease-in-out hover:bg-[#F36A21] hover:text-white hover:border-white"
+                >
+                Agende um Serviço
+                  </a>
+                    </div>
 
 
         {/* Trust Bar */}
