@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function Hero() {
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -30,22 +32,22 @@ export default function Hero() {
         {/* Dual CTAs */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             {/* Botão laranja */}
-            <a
-                href="#motos"
+            <Link
+                href="/motos"
                 className="bg-[#F36A21] text-white font-montserrat font-bold text-lg px-8 py-4 rounded-lg shadow-md 
                 transition-all duration-250 ease-in-out transform hover:-translate-y-0.5 hover:bg-[#E55A1A]"
             >
             Confira Nossas Motos
-            </a>
+            </Link>
 
             {/* Botão branco */}
-               <a
-                href="/agendarServicos"
+               <Link
+                href="/servicos"
                 className="bg-white text-[#F36A21] border border-white font-montserrat font-bold text-lg px-8 py-4 rounded-lg shadow-md
                         transition-all duration-250 ease-in-out hover:bg-[#F36A21] hover:text-white hover:border-white"
                 >
                 Agende um Serviço
-                  </a>
+                  </Link>
                     </div>
 
 

@@ -11,8 +11,8 @@ interface Props {
 
 export default function MotoList({ motos, onEdit, onDelete, onDeleteImage }: Props) {
   return (
-    <div className="p-4 border rounded">
-      <h2 className="font-semibold mb-3">Lista de motos</h2>
+    <div className="p-4 rounded">
+      <h2 className="font-extrabold text-gray-800 mb-3">Lista de motos</h2>
 
       {motos.length === 0 ? (
         <p className="text-sm text-gray-500">Nenhuma moto cadastrada.</p>
@@ -31,7 +31,7 @@ export default function MotoList({ motos, onEdit, onDelete, onDeleteImage }: Pro
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="font-semibold">
+                    <div className="font-semibold text-gray-800">
                       {m.nome} <span className="text-sm text-gray-500">({m.marca} - {m.ano})</span>
                     </div>
                     <div className="text-sm text-gray-600">R$ {m.preco}</div>

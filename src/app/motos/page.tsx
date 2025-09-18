@@ -1,41 +1,38 @@
 "use client";
 
+import { useState, useEffect, useMemo } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { Moto } from "@/types/moto"; // 1. Importando o tipo unificado
 import Header from "@/components/Header";
 import SidebarFilters, { Filters } from "@/components/SidebarFilters";
 import MotosControls, { SortOptions, ViewOptions } from "@/components/MotosControls";
-import { useState, useEffect, useMemo } from "react";
-import { supabase } from "@/lib/supabaseClient";
 
-type Moto = {
-  id: string;
-  nome: string;
-  marca: string;
-  categoria: string;
-  modelo: string;
-  ano: number;
-  preco: number;
-  quilometragem: number;
-  imagem_url: string;
-};
-
-// Componente separado para cada card de moto
+// Componente de Card com o layout que você pediu
 function MotoCard({ moto }: { moto: Moto }) {
   return (
-    <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow">
-      <img src={moto.imagem_url} alt={moto.nome} className="w-full h-56 object-cover" />
-      <div className="p-6 space-y-2">
-        <h2 className="text-xl font-bold text-[#F36A21] font-montserrat">{moto.nome}</h2>
+    <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow flex flex-col">
+      <div className="w-full h-56 bg-gray-200">
+        {moto.imagem_url ? (
+          <img src={moto.imagem_url} alt={`${moto.marca} ${moto.nome}`} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-500">Sem imagem</div>
+        )}
+      </div>
 
-        <div className="flex flex-wrap gap-2 text-gray-600 text-sm font-montserrat">
-          <span className="font-semibold">{moto.marca}</span>
+      <div className="p-6 flex flex-col flex-grow space-y-3">
+        {/* Título: Marca, Nome e Ano */}
+        <h2 className="text-xl font-bold text-[#F36A21] font-montserrat">
+          {`${moto.marca} ${moto.nome} - ${moto.ano}`}
+        </h2>
+
+        {/* Detalhes: KM, Cilindrada e Categoria */}
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-gray-600 text-sm font-montserrat">
+          <span>{moto.quilometragem?.toLocaleString("pt-BR") ?? 0} km</span>
+          <span>• {moto.cilindrada} cc</span>
           <span>• {moto.categoria}</span>
-          <span>• {moto.ano}</span>
         </div>
 
-        <p className="text-gray-500 text-sm font-montserrat">
-          {moto.quilometragem.toLocaleString("pt-BR")} km
-        </p>
-
+        <div className="flex-grow"></div>
         <p className="text-2xl font-extrabold text-[#1E1E1E] font-montserrat">
           R$ {moto.preco.toLocaleString("pt-BR")}
         </p>
@@ -51,39 +48,36 @@ export default function MotosPage() {
   const [sortBy, setSortBy] = useState<SortOptions>("price-low");
   const [view, setView] = useState<ViewOptions>("grid");
 
-  // Fetch motos
   useEffect(() => {
     const fetchMotos = async () => {
-      const { data, error } = await supabase.from("motos").select("*");
-      if (!error) setMotos(data || []);
+      // 2. Buscando da nossa VIEW otimizada!
+      const { data, error } = await supabase
+        .from("motos_com_imagem_destaque")
+        .select("*");
+      
+      if (error) {
+        console.error("Erro ao buscar motos:", error);
+      } else {
+        setMotos(data as Moto[] || []);
+      }
       setLoading(false);
     };
     fetchMotos();
   }, []);
 
-  // Filtra e ordena motos usando useMemo
   const filteredMotos = useMemo(() => {
     let temp = [...motos];
 
     if (filters.marcas.length) temp = temp.filter((m) => filters.marcas.includes(m.marca));
-    if (filters.tipos.length) temp = temp.filter((m) => filters.tipos.includes(m.categoria));
+    if (filters.tipos.length) temp = temp.filter((m) => m.categoria && filters.tipos.includes(m.categoria));
 
+    // A lógica de ordenação e filtro continua a mesma
     switch (sortBy) {
-      case "price-low":
-        temp.sort((a, b) => a.preco - b.preco);
-        break;
-      case "price-high":
-        temp.sort((a, b) => b.preco - a.preco);
-        break;
-      case "year-new":
-        temp.sort((a, b) => b.ano - a.ano);
-        break;
-      case "year-old":
-        temp.sort((a, b) => a.ano - b.ano);
-        break;
-      case "mileage-low":
-        temp.sort((a, b) => a.quilometragem - b.quilometragem);
-        break;
+        case "price-low": temp.sort((a, b) => a.preco - b.preco); break;
+        case "price-high": temp.sort((a, b) => b.preco - a.preco); break;
+        case "year-new": temp.sort((a, b) => b.ano - b.ano); break;
+        case "year-old": temp.sort((a, b) => a.ano - b.ano); break;
+        case "mileage-low": temp.sort((a, b) => (a.quilometragem ?? 0) - (b.quilometragem ?? 0)); break;
     }
 
     return temp;
@@ -92,7 +86,6 @@ export default function MotosPage() {
   return (
     <>
       <main className="bg-gray-100 min-h-screen py-12 px-4 md:px-12 flex flex-col md:flex-row gap-8">
-        {/* Sidebar */}
         <div className="w-full md:w-64 flex-shrink-0 flex justify-center md:justify-start">
           <SidebarFilters onFilterChange={setFilters} className="self-start" />
         </div>
@@ -105,7 +98,6 @@ export default function MotosPage() {
             view={view}
             setView={setView}
           />
-
           {loading ? (
             <p className="text-center text-[#F36A21] font-montserrat">Carregando motos...</p>
           ) : filteredMotos.length === 0 ? (
@@ -113,7 +105,7 @@ export default function MotosPage() {
               Nenhuma moto disponível com os filtros aplicados.
             </p>
           ) : (
-            <div className={`grid gap-8 ${view === "grid" ? "sm:grid-cols-2 lg:grid-cols-4" : "grid-cols-1"}`}>
+            <div className={`grid gap-8 ${view === "grid" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1"}`}>
               {filteredMotos.map((moto) => (
                 <MotoCard key={moto.id} moto={moto} />
               ))}

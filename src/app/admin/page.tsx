@@ -17,47 +17,77 @@ export default function AdminPage() {
   const [motos, setMotos] = useState<MotoWithId[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingMoto, setEditingMoto] = useState<Moto | null>(null);
+  const [formKey, setFormKey] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
     if (isAdmin) fetchMotos();
   }, [isAdmin]);
 
-  async function fetchMotos() {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('motos')
-        .select('*, motos_imagens(id, url)')
-        .order('created_at', { ascending: false });
+async function fetchMotos() {
+  setLoading(true);
+  try {
+    const { data, error } = await supabase
+      .from('motos')
+      // 1. Peça TODAS as colunas da tabela de imagens
+      .select('*, motos_imagens(*)') 
+      // 2. Ordena a lista de motos pela data de criação
+      .order('created_at', { ascending: false })
+      // 3. (Bônus) Ordena as IMAGENS de cada moto pela coluna 'ordem'
+      .order('ordem', { foreignTable: 'motos_imagens', ascending: true });
 
-      if (error) throw error;
+    if (error) throw error;
 
-      // Garante que todas motos têm id
-      const motosWithId: MotoWithId[] = (data || []).filter((m): m is MotoWithId => !!m.id);
-      setMotos(motosWithId);
-
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error('Erro ao buscar motos:', err.message);
-      } else {
-        console.error('Erro desconhecido ao buscar motos:', err);
-      }
+    const motosWithId: MotoWithId[] = (data || []).filter((m): m is MotoWithId => !!m.id);
+    setMotos(motosWithId);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error('Erro ao buscar motos:', err.message);
+    } else {
+      console.error('Erro desconhecido ao buscar motos:', err);
     }
+  } finally {
+    setLoading(false);
+  }
+}
+
+// Função para upload das imagens e retornar URLs públicas
+async function uploadFiles(motoId: string, files: FileList) {
+  const uploadedUrls: string[] = [];
+
+  for (const f of Array.from(files)) {
+    const safeName = f.name
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9.\-_]/g, '_');
+
+    const path = `${motoId}/${safeName}`;
+    const { error } = await supabase.storage.from('motos').upload(path, f, { upsert: true });
+
+    if (error) {
+      console.error('Erro ao enviar arquivo:', error.message);
+      continue;
+    }
+
+    const { data } = supabase.storage.from('motos').getPublicUrl(path);
+    if (!data?.publicUrl) {
+      console.error('Erro ao obter URL pública da imagem:', f.name);
+      continue;
+    }
+
+    uploadedUrls.push(data.publicUrl);
   }
 
-  async function uploadFiles(motoId: string, files: FileList) {
-    for (const f of Array.from(files)) {
-      const safeName = f.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9.\-_]/g, '_');
-      const path = `${motoId}/${safeName}`;
-      await supabase.storage.from('motos').upload(path, f, { upsert: true });
-    }
-  }
+  return uploadedUrls;
+}
 
-  async function handleSubmit(moto: Moto, files?: FileList | null) {
+async function handleSubmit(moto: Moto, files?: FileList | null) {
+  // O objeto com os dados da moto permanece o mesmo
   const motoToInsert = {
-    nome: moto.nome,
     marca: moto.marca,
+    nome: moto.nome,
+    cilindrada: moto.cilindrada,
+    cor: moto.cor,
     ano: moto.ano,
     preco: moto.preco,
     descricao: moto.descricao,
@@ -65,54 +95,109 @@ export default function AdminPage() {
     categoria: moto.categoria,
   };
 
-  if (moto.id) {
-    // edição
-    await supabase.from('motos').update(motoToInsert).eq('id', moto.id);
-    if (files && files.length > 0) await uploadFiles(moto.id, files);
+  let motoId = moto.id;
+
+  if (motoId) {
+    // Edição
+    await supabase.from('motos').update(motoToInsert).eq('id', motoId);
   } else {
-    // inserção
-    const { data, error } = await supabase.from('motos').insert([motoToInsert]).select().single();
+    // Inserção
+    const { data, error } = await supabase
+      .from('motos')
+      .insert([motoToInsert])
+      .select()
+      .single();
+
     if (error) {
       console.error('Erro ao inserir moto:', error);
       return;
     }
-    if (data && files) await uploadFiles(data.id!, files);
+
+    motoId = data.id; // O '!' não é estritamente necessário aqui, mas não prejudica
+  }
+
+  // Se houver arquivos para upload, executa este bloco
+  if (files && files.length > 0) {
+    // --- CORREÇÃO APLICADA AQUI ---
+    // 1. Adicionamos a verificação de segurança (Type Guard)
+    // Isso garante que `motoId` não é nulo ou indefinido antes de continuar.
+    if (!motoId) {
+      console.error("ID da moto é inválido, não é possível fazer o upload dos arquivos.");
+      return; // Interrompe a execução se não houver um ID
+    }
+
+    // 2. A chamada agora é segura. O TypeScript entende que `motoId` é uma string.
+    const urls = await uploadFiles(motoId, files);
+
+    // Filtrar somente URLs definidas
+    const validUrls = urls.filter((url): url is string => !!url);
+
+    const imagesToInsert = validUrls.map((url, idx) => ({
+      // Agora que a verificação foi feita, o '!' aqui também se torna opcional,
+      // pois o TypeScript já sabe que motoId é uma string.
+      moto_id: motoId,
+      url,
+      destaque: idx === 0,
+      ordem: idx,
+    }));
+
+    const { error: imgError } = await supabase.from('motos_imagens').insert(imagesToInsert);
+    if (imgError) console.error('Erro ao inserir imagens no banco:', imgError);
   }
 
   setEditingMoto(null);
   fetchMotos();
+  setFormKey(prevKey => prevKey + 1);
 }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Deseja realmente excluir?')) return;
 
-    // Deleta imagens do storage
-    const { data: imgs } = await supabase.from('motos_imagens').select('id, url').eq('moto_id', id);
-    if (imgs) {
-      for (const img of imgs) {
-        try {
-          const parts = img.url.split('/object/public/')[1]?.split('/').slice(1).join('/');
-          if (parts) await supabase.storage.from('motos').remove([`${id}/${parts.split('/').pop()}`]);
-        } catch {}
-      }
-      await supabase.from('motos_imagens').delete().eq('moto_id', id);
-    }
-
-    await supabase.from('motos').delete().eq('id', id);
-    fetchMotos();
-  }
-
-  async function handleDeleteImage(imgId: string, motoId: string, url?: string) {
-    if (!confirm('Remover imagem?')) return;
-    if (url) {
+async function handleDelete(id: string) {
+  if (!confirm('Deseja realmente excluir?')) return;
+  
+  // Deleta imagens do storage
+  const { data: imgs } = await supabase.from('motos_imagens').select('id, url').eq('moto_id', id);
+  if (imgs) {
+    for (const img of imgs) {
       try {
-        const parts = url.split('/object/public/')[1]?.split('/').slice(1).join('/');
-        if (parts) await supabase.storage.from('motos').remove([`${motoId}/${parts.split('/').pop()}`]);
+        const parts = img.url.split('/object/public/')[1]?.split('/').slice(1).join('/');
+        if (parts) await supabase.storage.from('motos').remove([`${id}/${parts.split('/').pop()}`]);
       } catch {}
     }
-    await supabase.from('motos_imagens').delete().eq('id', imgId);
-    fetchMotos();
+    await supabase.from('motos_imagens').delete().eq('moto_id', id);
   }
+  
+  await supabase.from('motos').delete().eq('id', id);
+  fetchMotos();
+}
+
+async function handleDeleteImage(imgId: string, motoId: string, url?: string) {
+  if (!confirm('Remover imagem?')) return;
+  if (url) {
+    try {
+      const parts = url.split('/object/public/')[1]?.split('/').slice(1).join('/');
+      const fileName = parts?.split('/').pop();
+      if (fileName) {
+        await supabase.storage.from('motos').remove([`${motoId}/${fileName}`]);
+      }
+    } catch (err) {
+      console.error('Erro ao remover arquivo do storage:', err);
+    }
+  }
+  await supabase.from('motos_imagens').delete().eq('id', imgId);
+  fetchMotos();
+}
+
+// async function handleDeleteImage(imgId: string, motoId: string, url?: string) {
+  //   if (!confirm('Remover imagem?')) return;
+  //   if (url) {
+  //     try {
+  //       const parts = url.split('/object/public/')[1]?.split('/').slice(1).join('/');
+  //       if (parts) await supabase.storage.from('motos').remove([`${motoId}/${parts.split('/').pop()}`]);
+  //     } catch {}
+  //   }
+  //   await supabase.from('motos_imagens').delete().eq('id', imgId);
+  //   fetchMotos();
+  // }
 
   if (isAdmin === null) return <Loading />;
   if (isAdmin === false) return <AccessDenied />;
@@ -123,16 +208,20 @@ export default function AdminPage() {
       <div className="mb-4">
         <button
           onClick={() => router.push('/')}
-          className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded cursor-pointer"
         >
-          ← Voltar para a página inicial
+          Voltar para a página inicial
         </button>
       </div>
-      <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-4 rounded shadow">
         <MotoForm
+          key={formKey}
           editingMoto={editingMoto}
           onSubmit={handleSubmit}
-          onCancel={() => setEditingMoto(null)}
+          onCancel={() => {
+            setEditingMoto(null);
+            setFormKey(prevKey => prevKey + 1);
+          }}
         />
         <MotoList
           motos={motos}
@@ -141,7 +230,7 @@ export default function AdminPage() {
           onDeleteImage={handleDeleteImage}
         />
       </div>
-      {loading && <p className="text-sm text-gray-500">Carregando motos...</p>}
+      {loading && <p className="text-sm text-gray-900">Carregando motos...</p>}
     </AdminLayout>
   );
 }

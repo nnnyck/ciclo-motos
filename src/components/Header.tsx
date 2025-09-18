@@ -96,12 +96,12 @@ export default function Header() {
             >
               Motos
             </Link>
-            <a href="#serviços" className="text-[#6C757D] hover:text-[#F36A21] transition">
+            <Link
+              href="/servicos"
+              className="text-[#6C757D] hover:text-[#F36A21] transition"
+            >
               Serviços
-            </a>
-            <a href="/agendarServicos" className="text-[#6C757D] hover:text-[#F36A21] transition">
-              Agendar Serviços
-            </a>
+            </Link>
             <a href="#testimonials" className="text-[#6C757D] hover:text-[#F36A21] transition">
               Sobre
             </a>
@@ -150,15 +150,12 @@ export default function Header() {
         {/* Mobile Menu */}
         {menuOpen && (
           <div className="md:hidden pb-4 flex flex-col space-y-3">
-            <a href="#motos" className="text-[#6C757D] hover:text-[#F36A21] transition">
+            <Link href="/motos" className="text-[#6C757D] hover:text-[#F36A21] transition">
               Motos
-            </a>
-            <a href="#serviços" className="text-[#6C757D] hover:text-[#F36A21] transition">
+            </Link>
+            <Link href="/servicos" className="text-[#6C757D] hover:text-[#F36A21] transition">
               Serviços
-            </a>
-            <a href="/agendarServicos" className="text-[#6C757D] hover:text-[#F36A21] transition">
-              Agendar Serviços
-            </a>
+            </Link>
             <a href="#testimonials" className="text-[#6C757D] hover:text-[#F36A21] transition">
               Sobre
             </a>
