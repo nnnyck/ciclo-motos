@@ -15,7 +15,10 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
   const [cilindrada, setCilindrada] = useState<number | undefined>(editingMoto?.cilindrada);
   const [cor, setCor] = useState<Moto['cor'] | undefined>(editingMoto?.cor);
   const [ano, setAno] = useState<number | undefined>(editingMoto?.ano);
-  const [preco, setPreco] = useState(editingMoto?.preco || '');
+  
+  // MUDANÇA 1: Garantimos que o estado inicial seja sempre string
+  const [preco, setPreco] = useState(editingMoto?.preco?.toString() || '');
+  
   const [descricao, setDescricao] = useState(editingMoto?.descricao || '');
   const [quilometragem, setQuilometragem] = useState<number | undefined>(editingMoto?.quilometragem);
   const [categoria, setCategoria] = useState(editingMoto?.categoria || '');
@@ -27,10 +30,13 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
       id: editingMoto?.id,
       marca,
       nome,
-      cilindrada: cilindrada ?? 0, // garante number
-      cor: cor ?? MotoCor.Preto,   // garante valor válido
+      cilindrada: cilindrada ?? 0,
+      cor: cor ?? MotoCor.Preto,
       ano: ano ?? 0,
-      preco,
+      
+      // MUDANÇA 2: Convertemos a string de volta para número no envio
+      preco: Number(preco) || 0,
+      
       descricao,
       quilometragem,
       categoria,
@@ -41,7 +47,7 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
     <div className="p-4 rounded">
       <h2 className="font-extrabold text-gray-800 mb-3">{editingMoto ? 'Editar moto' : 'Criar nova moto'}</h2>
       <form onSubmit={handleSubmit} className="space-y-2">
-
+        {/* ...outros inputs... */}
         <input
           className="w-full p-2 border rounded text-gray-800"
           placeholder="Marca"
@@ -55,7 +61,7 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
           value={nome}
           onChange={(e) => setNome(e.target.value)}
         />
-
+        
         <input
           type="number"
           className="w-full p-2 border rounded text-gray-800"
@@ -76,7 +82,7 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
-
+        
         <input
           type="number"
           className="w-full p-2 border rounded text-gray-800"
@@ -87,13 +93,15 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
           }
         />
 
+        {/* MUDANÇA 3: Adicionado type="number" para melhor UX */}
         <input
+          type="number"
           className="w-full p-2 border rounded text-gray-800"
           placeholder="Preço"
           value={preco}
           onChange={(e) => setPreco(e.target.value)}
         />
-
+        
         <input
           type="number"
           className="w-full p-2 border rounded text-gray-800"
@@ -110,14 +118,15 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
           value={categoria}
           onChange={(e) => setCategoria(e.target.value)}
         />
-
+        
         <textarea
           className="w-full p-2 border rounded text-gray-800"
           placeholder="Descrição"
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
         />
-
+        
+        {/* ...resto do formulário... */}
         <div>
           <label className="block text-sm mb-1"></label>
           <input
@@ -140,7 +149,6 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
             <p className="text-sm text-gray-600 mt-1">{files.length} arquivo(s) selecionado(s)</p>
           )}
         </div>
-
         <div className="flex gap-2">
           <button
             type="submit"
