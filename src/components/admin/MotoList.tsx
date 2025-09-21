@@ -8,9 +8,10 @@ interface Props {
   motos: MotoWithId[]
   onEdit: (m: MotoWithId) => void
   onDelete: (id: string) => void
+  onDeleteImage?: (imgId: string, motoId: string, url?: string) => void
 }
 
-export default function MotoList({ motos, onEdit, onDelete }: Props) {
+export default function MotoList({ motos, onEdit, onDelete, onDeleteImage }: Props) {
   const [selectedMoto, setSelectedMoto] = useState<MotoWithId | null>(null)
 
   // Deleta imagem do storage e banco e atualiza modal
