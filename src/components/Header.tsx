@@ -22,26 +22,13 @@ export default function Header() {
 
   const toggleMobileMenu = () => setMenuOpen(!menuOpen);
 
-   useEffect(() => {
-    const getUserAndProfile = async () => {
-      // pega usuário do supabase auth
+  useEffect(() => {
+    const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
-
-      if (user) {
-        const { data: profileData, error } = await supabase
-          .from("profiles")
-          .select("name")
-          .eq("id", user.id)
-          .single();
-
-        if (!error && profileData) {
-          setProfile(profileData);
-        }
-      }
     };
 
-    getUserAndProfile();
+    getUser();
 
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (_event, session) => {
@@ -53,6 +40,27 @@ export default function Header() {
       subscription.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    const getProfile = async () => {
+      if (!user) {
+        setProfile(null);
+        return;
+      }
+
+      const { data: profileData, error } = await supabase
+        .from("profiles")
+        .select("name")
+        .eq("id", user.id)
+        .single();
+
+      if (!error && profileData) {
+        setProfile(profileData);
+      }
+    };
+
+    getProfile();
+  }, [user]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -112,14 +120,20 @@ export default function Header() {
             {user ? (
               <>
                 <span className="text-[#6C757D]">Olá, {profile?.name}</span>
-                 {isAdmin && (
-                  <Link href="/admin" className="bg-red-600 text-white px-4 py-2 rounded">
+
+                {/* enquanto carrega, não mostra nada */}
+                {isAdmin === null ? null : isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="bg-red-600 text-white px-4 py-2 rounded"
+                  >
                     Admin
                   </Link>
                 )}
+
                 <button
                   onClick={handleLogout}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold px-6 py-2 rounded-lg transition"
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold px-6 py-2 rounded-lg transition cursor-pointer"
                 >
                   Sair
                 </button>

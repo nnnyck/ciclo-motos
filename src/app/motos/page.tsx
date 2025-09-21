@@ -3,43 +3,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Moto } from "@/types/moto"; // 1. Importando o tipo unificado
-import Header from "@/components/Header";
 import SidebarFilters, { Filters } from "@/components/SidebarFilters";
 import MotosControls, { SortOptions, ViewOptions } from "@/components/MotosControls";
+import MotoCard from "@/components/MotoCard";
 
-// Componente de Card com o layout que você pediu
-function MotoCard({ moto }: { moto: Moto }) {
-  return (
-    <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow flex flex-col">
-      <div className="w-full h-56 bg-gray-200">
-        {moto.imagem_url ? (
-          <img src={moto.imagem_url} alt={`${moto.marca} ${moto.nome}`} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-500">Sem imagem</div>
-        )}
-      </div>
-
-      <div className="p-6 flex flex-col flex-grow space-y-3">
-        {/* Título: Marca, Nome e Ano */}
-        <h2 className="text-xl font-bold text-[#F36A21] font-montserrat">
-          {`${moto.marca} ${moto.nome} - ${moto.ano}`}
-        </h2>
-
-        {/* Detalhes: KM, Cilindrada e Categoria */}
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-gray-600 text-sm font-montserrat">
-          <span>{moto.quilometragem?.toLocaleString("pt-BR") ?? 0} km</span>
-          <span>• {moto.cilindrada} cc</span>
-          <span>• {moto.categoria}</span>
-        </div>
-
-        <div className="flex-grow"></div>
-        <p className="text-2xl font-extrabold text-[#1E1E1E] font-montserrat">
-          R$ {moto.preco.toLocaleString("pt-BR")}
-        </p>
-      </div>
-    </div>
-  );
-}
 
 export default function MotosPage() {
   const [motos, setMotos] = useState<Moto[]>([]);
@@ -75,7 +42,7 @@ export default function MotosPage() {
     switch (sortBy) {
         case "price-low": temp.sort((a, b) => a.preco - b.preco); break;
         case "price-high": temp.sort((a, b) => b.preco - a.preco); break;
-        case "year-new": temp.sort((a, b) => b.ano - b.ano); break;
+        case "year-new": temp.sort((a, b) => b.ano - a.ano); break;
         case "year-old": temp.sort((a, b) => a.ano - b.ano); break;
         case "mileage-low": temp.sort((a, b) => (a.quilometragem ?? 0) - (b.quilometragem ?? 0)); break;
     }

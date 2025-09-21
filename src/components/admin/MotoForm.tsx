@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Moto, MotoCor } from '@/types/moto';
 
 interface Props {
@@ -10,58 +10,87 @@ interface Props {
 }
 
 export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
-  const [marca, setMarca] = useState(editingMoto?.marca || '');
-  const [nome, setNome] = useState(editingMoto?.nome || '');
-  const [cilindrada, setCilindrada] = useState<number | undefined>(editingMoto?.cilindrada);
-  const [cor, setCor] = useState<Moto['cor'] | undefined>(editingMoto?.cor);
-  const [ano, setAno] = useState<number | undefined>(editingMoto?.ano);
-  
-  // MUDANÇA 1: Garantimos que o estado inicial seja sempre string
-  const [preco, setPreco] = useState(editingMoto?.preco?.toString() || '');
-  
-  const [descricao, setDescricao] = useState(editingMoto?.descricao || '');
-  const [quilometragem, setQuilometragem] = useState<number | undefined>(editingMoto?.quilometragem);
-  const [categoria, setCategoria] = useState(editingMoto?.categoria || '');
+  const [marca, setMarca] = useState('');
+  const [nome, setNome] = useState('');
+  const [cilindrada, setCilindrada] = useState<number | undefined>(undefined);
+  const [cor, setCor] = useState<Moto['cor'] | undefined>(undefined);
+  const [ano, setAno] = useState<number | undefined>(undefined);
+  const [preco, setPreco] = useState('');
+  const [descricao, setDescricao] = useState('');
+  const [quilometragem, setQuilometragem] = useState<number | undefined>(undefined);
+  const [categoria, setCategoria] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
+
+  // 🔑 Atualiza os campos sempre que editingMoto mudar
+  useEffect(() => {
+    if (editingMoto) {
+      setMarca(editingMoto.marca || '');
+      setNome(editingMoto.nome || '');
+      setCilindrada(editingMoto.cilindrada ?? undefined);
+      setCor(editingMoto.cor ?? undefined);
+      setAno(editingMoto.ano ?? undefined);
+      setPreco(editingMoto.preco?.toString() || '');
+      setDescricao(editingMoto.descricao || '');
+      setQuilometragem(editingMoto.quilometragem ?? undefined);
+      setCategoria(editingMoto.categoria || '');
+      setFiles(null); // limpa arquivos antigos
+    } else {
+      // se for criação, limpa os campos
+      setMarca('');
+      setNome('');
+      setCilindrada(undefined);
+      setCor(undefined);
+      setAno(undefined);
+      setPreco('');
+      setDescricao('');
+      setQuilometragem(undefined);
+      setCategoria('');
+      setFiles(null);
+    }
+  }, [editingMoto]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      id: editingMoto?.id,
-      marca,
-      nome,
-      cilindrada: cilindrada ?? 0,
-      cor: cor ?? MotoCor.Preto,
-      ano: ano ?? 0,
-      
-      // MUDANÇA 2: Convertemos a string de volta para número no envio
-      preco: Number(preco) || 0,
-      
-      descricao,
-      quilometragem,
-      categoria,
-    }, files);
+    if (descricao.length > 150) {
+    alert("A descrição não pode ter mais de 150 caracteres.");
+    return; // Interrompe o envio
+  }
+    onSubmit(
+      {
+        id: editingMoto?.id,
+        marca,
+        nome,
+        cilindrada: cilindrada ?? 0,
+        cor: cor ?? MotoCor.Preto,
+        ano: ano ?? 0,
+        preco: Number(preco) || 0,
+        descricao,
+        quilometragem,
+        categoria,
+      },
+      files
+    );
   };
 
   return (
     <div className="p-4 rounded">
-      <h2 className="font-extrabold text-gray-800 mb-3">{editingMoto ? 'Editar moto' : 'Criar nova moto'}</h2>
+      <h2 className="font-extrabold text-gray-800 mb-3">
+        {editingMoto ? 'Editar moto' : 'Criar nova moto'}
+      </h2>
+
       <form onSubmit={handleSubmit} className="space-y-2">
-        {/* ...outros inputs... */}
         <input
           className="w-full p-2 border rounded text-gray-800"
           placeholder="Marca"
           value={marca}
           onChange={(e) => setMarca(e.target.value)}
         />
-
         <input
           className="w-full p-2 border rounded text-gray-800"
           placeholder="Nome"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
         />
-        
         <input
           type="number"
           className="w-full p-2 border rounded text-gray-800"
@@ -71,7 +100,6 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
             setCilindrada(e.target.value !== '' ? Number(e.target.value) : undefined)
           }
         />
-
         <select
           className="w-full p-2 border rounded text-gray-800"
           value={cor || ''}
@@ -82,7 +110,6 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
-        
         <input
           type="number"
           className="w-full p-2 border rounded text-gray-800"
@@ -92,8 +119,6 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
             setAno(e.target.value !== '' ? Number(e.target.value) : undefined)
           }
         />
-
-        {/* MUDANÇA 3: Adicionado type="number" para melhor UX */}
         <input
           type="number"
           className="w-full p-2 border rounded text-gray-800"
@@ -101,7 +126,6 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
           value={preco}
           onChange={(e) => setPreco(e.target.value)}
         />
-        
         <input
           type="number"
           className="w-full p-2 border rounded text-gray-800"
@@ -111,24 +135,21 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
             setQuilometragem(e.target.value !== '' ? Number(e.target.value) : undefined)
           }
         />
-
         <input
           className="w-full p-2 border rounded text-gray-800"
           placeholder="Categoria"
           value={categoria}
           onChange={(e) => setCategoria(e.target.value)}
         />
-        
         <textarea
           className="w-full p-2 border rounded text-gray-800"
           placeholder="Descrição"
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
         />
-        
-        {/* ...resto do formulário... */}
+
+        {/* Upload de imagens */}
         <div>
-          <label className="block text-sm mb-1"></label>
           <input
             id="fileInput"
             type="file"
@@ -136,7 +157,6 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
             className="hidden"
             onChange={(e) => setFiles(e.target.files)}
           />
-
           <button
             type="button"
             onClick={() => document.getElementById("fileInput")?.click()}
@@ -144,11 +164,11 @@ export default function MotoForm({ editingMoto, onSubmit, onCancel }: Props) {
           >
             Selecionar imagens
           </button>
-
           {files && (
             <p className="text-sm text-gray-600 mt-1">{files.length} arquivo(s) selecionado(s)</p>
           )}
         </div>
+
         <div className="flex gap-2">
           <button
             type="submit"

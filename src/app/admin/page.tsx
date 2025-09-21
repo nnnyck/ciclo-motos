@@ -171,48 +171,47 @@ async function handleDelete(id: string) {
 }
 
 async function handleDeleteImage(imgId: string, motoId: string, url?: string) {
-  if (!confirm('Remover imagem?')) return;
+  console.log('Deletando imagem:', imgId, 'da moto:', motoId, 'url:', url);
+
   if (url) {
     try {
-      const parts = url.split('/object/public/')[1]?.split('/').slice(1).join('/');
-      const fileName = parts?.split('/').pop();
-      if (fileName) {
-        await supabase.storage.from('motos').remove([`${motoId}/${fileName}`]);
-      }
+      // Extrai corretamente o path relativo ao bucket
+      const urlObj = new URL(url);
+      // A URL é algo como /storage/v1/object/public/motos/<motoId>/<fileName>
+      const parts = urlObj.pathname.split('/');
+      const fileIndex = parts.findIndex(p => p === motoId);
+      if (fileIndex === -1) throw new Error('Caminho inválido da imagem');
+      const filePath = parts.slice(fileIndex).join('/'); // <motoId>/<fileName>
+
+      console.log('Removendo do storage:', filePath);
+      const { error: storageError } = await supabase.storage.from('motos').remove([filePath]);
+      if (storageError) throw storageError;
+      console.log('Imagem removida do storage com sucesso!');
     } catch (err) {
       console.error('Erro ao remover arquivo do storage:', err);
+      return; // interrompe se não conseguir remover do storage
     }
   }
-  await supabase.from('motos_imagens').delete().eq('id', imgId);
+
+  // Deleta do banco
+  const { error: dbError } = await supabase.from('motos_imagens').delete().eq('id', imgId);
+  if (dbError) {
+    console.error('Erro ao deletar do banco:', dbError);
+    return;
+  }
+
+  console.log('Imagem deletada do banco com sucesso!');
+
+  // Atualiza a lista de motos
   fetchMotos();
 }
-
-// async function handleDeleteImage(imgId: string, motoId: string, url?: string) {
-  //   if (!confirm('Remover imagem?')) return;
-  //   if (url) {
-  //     try {
-  //       const parts = url.split('/object/public/')[1]?.split('/').slice(1).join('/');
-  //       if (parts) await supabase.storage.from('motos').remove([`${motoId}/${parts.split('/').pop()}`]);
-  //     } catch {}
-  //   }
-  //   await supabase.from('motos_imagens').delete().eq('id', imgId);
-  //   fetchMotos();
-  // }
 
   if (isAdmin === null) return <Loading />;
   if (isAdmin === false) return <AccessDenied />;
 
   return (
     <AdminLayout>
-       {/* Botão de voltar */}
-      <div className="mb-4">
-        <button
-          onClick={() => router.push('/')}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded cursor-pointer"
-        >
-          Voltar para a página inicial
-        </button>
-      </div>
+
       <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-4 rounded shadow">
         <MotoForm
           key={formKey}
