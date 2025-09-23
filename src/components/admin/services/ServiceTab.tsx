@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import { ServiceWithId, Service } from '@/types/service'
+import { Service } from '@/types/service'
 import ServiceForm from './ServiceForm'
 import ServiceList from './ServiceList'
 
 export default function ServiceTab() {
-  const [services, setServices] = useState<ServiceWithId[]>([])
-  const [editingService, setEditingService] = useState<ServiceWithId | null>(null)
+  const [services, setServices] = useState<Service[]>([])
+  const [editingService, setEditingService] = useState<Service | null>(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -20,25 +20,27 @@ export default function ServiceTab() {
     const { data, error } = await supabase
       .from('servicos')
       .select('*')
-      .order('nome', { ascending: true }) // coluna correta
+      .order('nome', { ascending: true })
+
     if (error) {
-      console.error(error)
+      console.error('Erro ao buscar serviços:', error)
       setServices([])
     } else {
-      setServices((data as ServiceWithId[]) || [])
+      // garante que data seja do tipo Service[]
+      setServices((data as Service[]) || [])
     }
     setLoading(false)
   }
 
-  async function handleSubmit(service: Omit<Service, 'id'> | ServiceWithId) {
+  async function handleSubmit(service: Omit<Service, 'id'> | Service) {
     if ('id' in service) {
       // Update
       const { error } = await supabase.from('servicos').update(service).eq('id', service.id)
-      if (error) console.error(error)
+      if (error) console.error('Erro ao atualizar serviço:', error)
     } else {
       // Insert
       const { error } = await supabase.from('servicos').insert([service])
-      if (error) console.error(error)
+      if (error) console.error('Erro ao inserir serviço:', error)
     }
     setEditingService(null)
     fetchServices()
@@ -46,7 +48,7 @@ export default function ServiceTab() {
 
   async function handleDelete(id: string) {
     const { error } = await supabase.from('servicos').delete().eq('id', id)
-    if (error) console.error(error)
+    if (error) console.error('Erro ao deletar serviço:', error)
     fetchServices()
   }
 
