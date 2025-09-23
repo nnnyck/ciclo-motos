@@ -1,10 +1,10 @@
 'use client'
 
-import { ServiceWithId } from '@/types/service'
+import { Service } from '@/types/service'
 
 interface Props {
-  services: ServiceWithId[]
-  onEdit: (service: ServiceWithId) => void
+  services: Service[]
+  onEdit: (service: Service) => void
   onDelete: (id: string) => void
   loading: boolean
 }
