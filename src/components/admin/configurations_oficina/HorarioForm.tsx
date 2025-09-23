@@ -42,7 +42,7 @@ export default function HorariosForm({ configuracao_id }: Props) {
     fetchHorarios();
   }, [configuracao_id]);
 
-  const handleChange = (index: number, field: keyof Horario, value: any) => {
+  const handleChange = (index: number, field: keyof Horario, value: string | boolean) => {
     const updated = [...horarios];
     updated[index] = { ...updated[index], [field]: value };
     setHorarios(updated);
