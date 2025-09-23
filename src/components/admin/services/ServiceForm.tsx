@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Service, ServiceWithId } from '@/types/service'
+import { Service } from '@/types/service'
 
 interface Props {
-  editingService: ServiceWithId | null
-  onSubmit: (service: Omit<Service, 'id'> | ServiceWithId) => void | Promise<void>
+  editingService: Service | null
+  onSubmit: (service: Omit<Service, 'id'> | Service) => void | Promise<void>
   onCancel: () => void
 }
 
