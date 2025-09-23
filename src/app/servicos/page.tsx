@@ -10,7 +10,6 @@ export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
-  // Buscar serviços do Supabase
   useEffect(() => {
     const fetchServices = async () => {
       const { data, error } = await supabase.from('servicos').select('*');
@@ -18,15 +17,17 @@ export default function ServicesPage() {
         console.error('Erro ao buscar serviços:', error);
         return;
       }
-      // mapear para os tipos corretos
-      setServices(
-        data.map((d: any) => ({
-          id: d.id,
-          nome: d.nome,
-          duracao_minutos: d.duracao_minutos,
-          preco: d.preco,
-        }))
-      );
+
+      // Forçar tipagem para Service
+      const mappedServices: Service[] = (data as Service[]).map((d) => ({
+        id: d.id,
+        nome: d.nome,
+        duracao_minutos: d.duracao_minutos,
+        preco: d.preco,
+        descricao: d.descricao,
+      }));
+
+      setServices(mappedServices);
     };
 
     fetchServices();
@@ -43,6 +44,5 @@ export default function ServicesPage() {
         />
       </div>
     </div>
-
   );
 }
