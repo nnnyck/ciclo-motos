@@ -6,6 +6,8 @@ import { supabase } from "@/lib/supabaseClient";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { useAdmin } from "@/hooks/useAdmin";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 interface Profile {
   name: string;
@@ -119,7 +121,13 @@ export default function Header() {
 
             {user ? (
               <>
-                <span className="text-[#6C757D]">Olá, {profile?.name}</span>
+                <Link
+                  href="/perfil"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 text-[#6C757D] hover:text-[#F36A21] transition"
+                >
+                  <FontAwesomeIcon icon={faUser} className="h-6 w-6" />
+                </Link>
+
 
                 {/* enquanto carrega, não mostra nada */}
                 {isAdmin === null ? null : isAdmin && (

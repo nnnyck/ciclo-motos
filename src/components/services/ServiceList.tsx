@@ -24,7 +24,7 @@ export default function ServiceList({ services, selectedService, onSelect }: Pro
             onClick={() => onSelect(service)}
           >
             <h3 className="font-semibold text-gray-800">{service.nome}</h3>
-            <p className="text-sm text-gray-500">Duração: {service.duracao_minutos}</p>
+            <p className="text-sm text-gray-500">Duração: {service.duracao_minutos} minutos</p>
             <p className="text-sm font-bold text-green-600">R$ {service.preco}</p>
           </div>
         ))}
