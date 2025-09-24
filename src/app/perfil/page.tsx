@@ -30,6 +30,15 @@ interface Appointment {
   servico: Service;
 }
 
+interface RawAppointment {
+  id: string;
+  data: string;
+  hora: string;
+  status: string;
+  servico?: Service[]; // porque vem como array
+}
+
+
 export default function PerfilPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userData, setUserData] = useState<User | null>(null);
@@ -79,13 +88,13 @@ export default function PerfilPage() {
         return;
       }
 
-      const mappedAppointments: Appointment[] = (appointmentsData || []).map((a: any) => ({
+        const mappedAppointments: Appointment[] = (appointmentsData as RawAppointment[] || []).map(a => ({
         id: a.id,
         data: a.data,
         hora: a.hora,
         status: a.status,
         servico: a.servico?.[0] || { id: '', nome: '', duracao_minutos: 0, preco: 0 }
-      }));
+        }));
 
       setAppointments(mappedAppointments);
       setLoading(false);

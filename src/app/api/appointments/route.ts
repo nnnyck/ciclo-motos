@@ -52,8 +52,10 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json(agendamento);
-  } catch (err: any) {
-    console.error(err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
+  } catch (err: unknown) {
+  console.error(err);
+  // Se err for um Error, use err.message; senão, transforme em string
+  const message = err instanceof Error ? err.message : String(err);
+  return NextResponse.json({ error: message }, { status: 500 });
+}
 }
