@@ -61,6 +61,12 @@ export default function AppointmentTab() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
+  function formatDate(dateStr: string): string {
+  const [year, month, day] = dateStr.split("-");
+  return `${day}/${month}/${year}`;
+}
+
+
   const fetchAppointments = async () => {
     setLoading(true);
     try {
@@ -178,16 +184,9 @@ export default function AppointmentTab() {
                   <strong>Serviço:</strong> {a.servico?.nome ?? 'N/A'}
                 </p>
                 <p className="text-gray-700">
-                  <strong>Data:</strong>{' '}
-                  {(() => {
-                    try {
-                      return new Date(a.data).toLocaleDateString('pt-BR');
-                    } catch {
-                      return a.data;
-                    }
-                  })()}{' '}
-                  às {a.hora}
+                  <strong>Data:</strong> {formatDate(a.data)} às {a.hora}
                 </p>
+
                 <p className="text-gray-700">
                   <strong>Status:</strong>{' '}
                   <span
