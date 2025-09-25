@@ -8,53 +8,65 @@ interface Appointment {
   data: string;
   hora: string;
   status: string;
-  profile: { id: string; name: string; phone: string | null };
-  servico: { id: string; nome: string; preco: number };
+  profile: { id: string; name: string; phone: string | null } | null;
+  servico: { id: string; nome: string; preco: number } | null;
+}
+
+// Representa o formato que o Supabase retorna (arrays internos)
+interface RawAppointment {
+  id: string;
+  data: string;
+  hora: string;
+  status: string;
+  profile: { id: string; name: string; phone: string | null }[];
+  servico: { id: string; nome: string; preco: number }[];
 }
 
 export default function AppointmentTab() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
-const fetchAppointments = async () => {
-  setLoading(true);
+  const fetchAppointments = async () => {
+    setLoading(true);
 
-  const { data, error } = await supabase
-    .from("agendamentos")
-    .select(`
-      id,
-      data,
-      hora,
-      status,
-      profile:profiles (
+    const { data, error } = await supabase
+      .from("agendamentos")
+      .select(`
         id,
-        name,
-        phone
-      ),
-      servico:servicos (
-        id,
-        nome,
-        preco
-      )
-    `)
-    .order("data", { ascending: true })
-    .order("hora", { ascending: true });
+        data,
+        hora,
+        status,
+        profile:profiles (
+          id,
+          name,
+          phone
+        ),
+        servico:servicos (
+          id,
+          nome,
+          preco
+        )
+      `)
+      .order("data", { ascending: true })
+      .order("hora", { ascending: true });
 
-  if (error) {
-    console.error(error);
-  } else if (data) {
-    // mapear os arrays para objetos únicos
-    const mapped = data.map((item: any) => ({
-      ...item,
-      profile: item.profile[0] ?? null,  // pega o primeiro item do array ou null
-      servico: item.servico[0] ?? null,
-    }));
-    setAppointments(mapped as Appointment[]);
-  }
+    if (error) {
+      console.error(error);
+    } else if (data) {
+      // mapear arrays para objetos únicos
+      const mapped: Appointment[] = (data as RawAppointment[]).map((item) => ({
+        id: item.id,
+        data: item.data,
+        hora: item.hora,
+        status: item.status,
+        profile: item.profile[0] ?? null,
+        servico: item.servico[0] ?? null,
+      }));
+      setAppointments(mapped);
+    }
 
-  setLoading(false);
-};
-
+    setLoading(false);
+  };
 
   const updateStatus = async (id: string, newStatus: string) => {
     const { error } = await supabase
