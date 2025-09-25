@@ -49,7 +49,7 @@ const tabs = [
           {/* Imagem */}
           <div className="relative">
             <img
-              src="https://images.pixabay.com/photo/2016/04/07/06/53/bmw-1313343_1280.jpg"
+              src="https://rlafoqhvligisnkgzzom.supabase.co/storage/v1/object/public/motos/photo-1558618666-fcd25c85cd64.avif"
               alt="Motos de qualidade à venda"
               className="w-full h-80 object-cover rounded-lg shadow-card"
               onError={(e) =>
@@ -163,7 +163,7 @@ const tabs = [
       {/* Imagem */}
       <div className="relative">
         <img
-          src="https://images.pixabay.com/photo/2016/11/29/05/45/motorcycle-1867431_1280.jpg"
+          src="https://rlafoqhvligisnkgzzom.supabase.co/storage/v1/object/public/motos/photo-1558618666-fcd25c85cd64.avif"
           alt="Nós compramos motos"
           className="w-full h-80 object-cover rounded-lg shadow-card"
           onError={(e) =>

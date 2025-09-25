@@ -34,10 +34,10 @@ export default function ServiceBenefits() {
               </svg>
             </div>
             <h3 className="text-lg font-montserrat font-bold text-gray-800 mb-2">
-              Fair Pricing
+              Preço Justo
             </h3>
             <p className="text-gray-600 text-sm">
-              Transparent, competitive pricing with no hidden fees or surprise charges
+              Preços transparentes e competitivos, sem taxas ocultas ou cobranças inesperadas
             </p>
           </div>
 
@@ -57,10 +57,10 @@ export default function ServiceBenefits() {
               </svg>
             </div>
             <h3 className="text-lg font-montserrat font-bold text-gray-800 mb-2">
-              Expert Mechanics
+              Mecânicos Experientes
             </h3>
             <p className="text-gray-600 text-sm">
-              ASE certified technicians with decades of motorcycle experience
+              Técnicos com anos de experiência em manutenção e reparo de motocicletas
             </p>
           </div>
 
@@ -80,10 +80,10 @@ export default function ServiceBenefits() {
               </svg>
             </div>
             <h3 className="text-lg font-montserrat font-bold text-gray-800 mb-2">
-              Quality Guarantee
+              Qualidade Garantida
             </h3>
             <p className="text-gray-600 text-sm">
-              90-day warranty on all repairs and 30-day guarantee on motorcycle sales
+              Garantia de 90 dias em todos os reparos e garantia de 30 dias na venda de motocicletas
             </p>
           </div>
 
@@ -99,10 +99,10 @@ export default function ServiceBenefits() {
                 </svg>
             </div>
             <h3 className="text-lg font-montserrat font-bold text-gray-800 mb-2">
-                Extensive Inventory
+                Inventário Extenso
             </h3>
             <p className="text-gray-600 text-sm">
-                Large selection of quality motorcycles from all major brands and categories
+                Grande seleção de motocicletas de qualidade de todas as principais marcas e categorias
             </p>
             </div>
         </div>
